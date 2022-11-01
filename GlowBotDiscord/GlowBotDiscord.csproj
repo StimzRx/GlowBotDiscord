@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <Configurations>Debug;Release;arm64</Configurations>
+        <Platforms>AnyCPU;arm64</Platforms>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="DSharpPlus" Version="4.2.0" />
+      <PackageReference Include="DSharpPlus.SlashCommands" Version="4.2.0" />
+    </ItemGroup>
+
+</Project>

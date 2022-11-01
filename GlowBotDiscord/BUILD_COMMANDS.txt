@@ -1,0 +1,5 @@
+﻿[ARM64 Linux Build]:
+docker buildx build --platform linux/arm64 -t stimzrx/glowbot:arm64 -f Dockerfile .
+
+[Publish]
+docker image push --all-tags stimzrx/glowbot

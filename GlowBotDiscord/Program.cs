@@ -1,20 +1,19 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands;
 
-using GlowBot.Data;
-using GlowBot.Data.Entities;
-using GlowBot.SlashCommands;
+using GlowBotDiscord.Data;
+using GlowBotDiscord.Data.Entities;
+using GlowBotDiscord.SlashCommands;
 
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 
-namespace GlowBot;
+namespace GlowBotDiscord;
 
 internal class Program
 {
@@ -95,9 +94,9 @@ internal class Program
         {
             TokenType = TokenType.Bot,
             Token = botToken,
-            MinimumLogLevel = LogLevel.None,
+            MinimumLogLevel = LogLevel.Error,
             ReconnectIndefinitely = true,
-            Intents = DiscordIntents.AllUnprivileged | DiscordIntents.Guilds,
+            Intents = DiscordIntents.AllUnprivileged | DiscordIntents.Guilds | DiscordIntents.GuildMembers | DiscordIntents.GuildMessages,
         };
         _discord = new DiscordClient( conf );
 
@@ -105,12 +104,14 @@ internal class Program
         _discord.VoiceStateUpdated += OnVoiceStateUpdated;
         _discord.GuildMemberAdded += OnGuildMemberJoin;
         _discord.GuildMemberRemoved += OnGuildMemberLeave;
+        _discord.MessageCreated += OnMessageCreated;
 
         await _discord.ConnectAsync( );
 
         SlashCommandsExtension slashCmds = _discord.UseSlashCommands( );
         slashCmds.RegisterCommands<SlashUtility>( ConfigData.GUILD_MASTER_ID );
         slashCmds.RegisterCommands<SlashProgram>( ConfigData.GUILD_MASTER_ID );
+        slashCmds.RegisterCommands<SlashProfile>( ConfigData.GUILD_MASTER_ID );
 
         DateTime lastDbSave = DateTime.Now;
 
@@ -285,6 +286,39 @@ internal class Program
         if ( guildData.SWITCH_AUTO_MANAGE_NOOBS )
         {
             await e.Member.GrantRoleAsync( e.Guild.GetRole( guildData.ServerRole_Pending ) );
+        }
+    }
+    async private static Task OnMessageCreated( DiscordClient sender, MessageCreateEventArgs e )
+    {
+        if ( e.Guild == null )
+        {
+            return;
+        }
+        
+        
+        GuildData guildData = Database.GetGuildData( e.Guild );
+        if ( e.Channel.Id != guildData.ServerTC_General || e.Author.IsBot )
+        {
+            return;
+        }
+        DiscordMember member = (DiscordMember)e.Author;
+
+        GuildUserData userData = Database.GetUserData( member );
+        userData.Messages += 1;
+        
+        if ( ( DateTime.Now - userData.LastTalkedTime ).TotalSeconds >= 240 )
+        {
+            userData.LastTalkedTime = DateTime.Now;
+            if(userData.AddExperience( 0.5f ))
+            {
+                DiscordEmbedBuilder embedBuilder = new DiscordEmbedBuilder( );
+                embedBuilder.WithTitle( $"User Level Up" );
+                embedBuilder.WithColor( DiscordColor.Gold );
+                embedBuilder.WithThumbnail( member.AvatarUrl );
+                embedBuilder.AddField( "Level", userData.Level.ToString(), true );
+                embedBuilder.AddField( "Chats", userData.Messages.ToString(), true );
+                await e.Channel.SendMessageAsync( new DiscordMessageBuilder( ).AddEmbed( embedBuilder.Build( ) ) );
+            }
         }
     }
 

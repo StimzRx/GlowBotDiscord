@@ -1,6 +1,6 @@
 ﻿using DSharpPlus.Entities;
 
-namespace GlowBot.Data.Entities
+namespace GlowBotDiscord.Data.Entities
 {
     public class GuildData
     {
@@ -25,11 +25,8 @@ namespace GlowBot.Data.Entities
         
         public ulong ServerVC_NewVC { get; set; } = 0;
         public ulong ServerVC_Stats { get; set; } = 0;
-        
-        public ulong ServerTC_Leaderboard { get; set; } = 0;
         public ulong ServerTC_Logs { get; set; } = 0;
-        
-        public ulong ServerReactsMsg_PingSubscriber { get; set; } = 0;
+        public ulong ServerTC_General { get; set; } = 0;
 
         public List<ulong> MAVVoiceChannels { get; set; } = new List<ulong>( );
         

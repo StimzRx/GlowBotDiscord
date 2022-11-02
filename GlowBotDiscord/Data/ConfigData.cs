@@ -1,4 +1,4 @@
-﻿namespace GlowBot.Data
+﻿namespace GlowBotDiscord.Data
 {
     public class ConfigData
     {

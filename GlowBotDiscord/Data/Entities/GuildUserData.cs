@@ -1,6 +1,6 @@
 ﻿using DSharpPlus.Entities;
 
-namespace GlowBot.Data.Entities
+namespace GlowBotDiscord.Data.Entities
 {
     public class GuildUserData
     {
@@ -17,9 +17,29 @@ namespace GlowBot.Data.Entities
                 LastNewVCTime = lastTriggeredTime,
             };
         }
+
+        public bool AddExperience( float amount )
+        {
+            //round((4 * (level ^ 3)) / 5)
+            Experience += amount;
+            
+            if ( Experience >= GetExperienceToNextLevel( ) )
+            {
+                Level++;
+                Experience = 0;
+                return true;
+            }
+            return false;
+        }
+        public float GetExperienceToNextLevel( )
+        {
+            return MathF.Round( ( 4f * ( Level ^ 3 ) ) / 5f );
+        }
+        
         public ulong Snowflake { get; set; } = 0;
         public string Nickname { get; set; } = "_NULL_";
-        public ulong Experience { get; set; } = 0;
+        public float Experience { get; set; } = 0;
+        public ulong Level { get; set; } = 0;
         public long Currency { get; set; } = 0;
         public ulong Reports { get; set; } = 0;
         public ulong Messages { get; set; } = 0;

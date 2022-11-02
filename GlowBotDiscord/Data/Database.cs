@@ -1,8 +1,8 @@
 ﻿using DSharpPlus.Entities;
 
-using GlowBot.Data.Entities;
+using GlowBotDiscord.Data.Entities;
 
-namespace GlowBot.Data
+namespace GlowBotDiscord.Data
 {
     public class Database
     {

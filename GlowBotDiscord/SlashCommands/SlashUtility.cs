@@ -2,10 +2,10 @@
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 
-using GlowBot.API;
-using GlowBot.Data.Entities;
+using GlowBotDiscord.API;
+using GlowBotDiscord.Data.Entities;
 
-namespace GlowBot.SlashCommands
+namespace GlowBotDiscord.SlashCommands
 {
     public class SlashUtility : ApplicationCommandModule
     {

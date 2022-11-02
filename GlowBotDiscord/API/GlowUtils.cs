@@ -1,12 +1,11 @@
 ﻿using DSharpPlus.Entities;
 
-using GlowBot.Data.Entities;
+using GlowBotDiscord.Data.Entities;
 
-namespace GlowBot.API
+namespace GlowBotDiscord.API
 {
     public class GlowUtils
     {
-
         public static bool CheckPending( DiscordMember member, DiscordGuild guild )
         {
             GuildData guildData = Program.Database.GetGuildData( guild );

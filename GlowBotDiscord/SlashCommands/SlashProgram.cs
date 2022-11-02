@@ -2,10 +2,10 @@
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 
-using GlowBot.API;
-using GlowBot.Data.Entities;
+using GlowBotDiscord.API;
+using GlowBotDiscord.Data.Entities;
 
-namespace GlowBot.SlashCommands
+namespace GlowBotDiscord.SlashCommands
 {
     public class SlashProgram : ApplicationCommandModule
     {
@@ -54,6 +54,8 @@ namespace GlowBot.SlashCommands
             STATS,
             [ChoiceName("Logs")]
             LOGS,
+            [ChoiceName("General")]
+            GENERAL,
         }
         [SlashCommand( "ProgramChannel", "Programs guild in the Database" )]
         public async Task ProgramRoleCommand( InteractionContext ctx, [Option("Type", "Type of programming to do")] ProgramChannelType type, [Option("Target", "The target")]DiscordChannel channel  )
@@ -88,6 +90,17 @@ namespace GlowBot.SlashCommands
                     return;
                 }
                 guildData.ServerTC_Logs = channel.Id;
+                
+                await ctx.FollowUpAsync( new DiscordFollowupMessageBuilder(  ).AsEphemeral( ).WithContent( $"Log channel Snowflake was updated in the database." ) );
+            }
+            else if ( type is ProgramChannelType.GENERAL )
+            {
+                if ( channel.Type is ChannelType.Voice )
+                {
+                    await ctx.FollowUpAsync( new DiscordFollowupMessageBuilder(  ).AsEphemeral(  ).WithContent( $"Failed: Invalid channel type. Expecting TEXT channel!" ) );
+                    return;
+                }
+                guildData.ServerTC_General = channel.Id;
                 
                 await ctx.FollowUpAsync( new DiscordFollowupMessageBuilder(  ).AsEphemeral( ).WithContent( $"Log channel Snowflake was updated in the database." ) );
             }

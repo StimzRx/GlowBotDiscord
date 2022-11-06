@@ -10,6 +10,7 @@ namespace GlowBotDiscord.Data.Entities
             return new GuildUserData( )
             {
                 Snowflake = member.Id,
+                GuildSnowflake = member.Guild.Id,
                 Nickname = member.Username,
                 JoinDate = DateTime.Now,
                 LastTalkedTime = lastTriggeredTime,
@@ -18,28 +19,31 @@ namespace GlowBotDiscord.Data.Entities
             };
         }
 
-        public bool AddExperience( float amount )
+        public int AddExperience( float amount )
         {
-            //round((4 * (level ^ 3)) / 5)
             Experience += amount;
             
             if ( Experience >= GetExperienceToNextLevel( ) )
             {
                 Level++;
                 Experience = 0;
-                return true;
+                int addMoney = Random.Shared.Next( 5, 25 );
+                Currency += addMoney;
+                return addMoney;
             }
-            return false;
+            return -1;
         }
         public float GetExperienceToNextLevel( )
         {
-            return MathF.Round( ( 4f * ( Level ^ 3 ) ) / 5f );
+            return ( ( 4f * ( Level ^ 3 ) ) / 5f ) + 5f;
         }
         
         public ulong Snowflake { get; set; } = 0;
+        public ulong GuildSnowflake { get; set; } = 0;
+        public uint Version { get; set; } = 1;
         public string Nickname { get; set; } = "_NULL_";
         public float Experience { get; set; } = 0;
-        public ulong Level { get; set; } = 0;
+        public int Level { get; set; } = 0;
         public long Currency { get; set; } = 0;
         public ulong Reports { get; set; } = 0;
         public ulong Messages { get; set; } = 0;

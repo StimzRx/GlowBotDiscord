@@ -80,7 +80,7 @@ internal class Program
             {
                 Database = _jsonSerializer.Deserialize<Database>( tr ) ?? new Database( )
                 {
-                    Guilds = new List<GuildData>( ), Users = new List<GuildUserData>( ),
+                    Guilds = new List<GuildData>( ),
                 };
             }
         }
@@ -139,10 +139,6 @@ internal class Program
 
     async private static Task SaveDatabase( )
     {
-        // Save Database
-        if ( Database is null )
-            return;
-
         if ( File.Exists( BinPath + DbFileName ) )
         {
             File.Move( BinPath + DbFileName, BinPath + DbFileName+".bak", true );
@@ -157,9 +153,6 @@ internal class Program
         }
         
         // Save Config
-        if ( ConfigData is null )
-            return;
-
         if ( File.Exists( BinPath + ConfigFileName ) )
         {
             File.Move( BinPath + ConfigFileName, BinPath + ConfigFileName+".bak", true );
@@ -306,17 +299,19 @@ internal class Program
         GuildUserData userData = Database.GetUserData( member );
         userData.Messages += 1;
         
-        if ( ( DateTime.Now - userData.LastTalkedTime ).TotalSeconds >= 240 )
+        if ( ( DateTime.Now - userData.LastTalkedTime ).TotalMinutes >= 30 )
         {
             userData.LastTalkedTime = DateTime.Now;
-            if(userData.AddExperience( 0.5f ))
+
+            int returnAddMoney = userData.AddExperience( 0.75f );
+            if( returnAddMoney > 0 )
             {
                 DiscordEmbedBuilder embedBuilder = new DiscordEmbedBuilder( );
                 embedBuilder.WithTitle( $"User Level Up" );
                 embedBuilder.WithColor( DiscordColor.Gold );
                 embedBuilder.WithThumbnail( member.AvatarUrl );
                 embedBuilder.AddField( "Level", userData.Level.ToString(), true );
-                embedBuilder.AddField( "Chats", userData.Messages.ToString(), true );
+                embedBuilder.AddField( "Tokens", $"+{returnAddMoney}", true );
                 await e.Channel.SendMessageAsync( new DiscordMessageBuilder( ).AddEmbed( embedBuilder.Build( ) ) );
             }
         }

@@ -7,7 +7,6 @@ namespace GlowBotDiscord.Data
     public class Database
     {
         public List<GuildData> Guilds { get; set; } = new List<GuildData>( );
-        public List<GuildUserData> Users { get; set; } = new List<GuildUserData>( );
 
         public GuildData GetGuildData( DiscordGuild input )
         {
@@ -24,7 +23,9 @@ namespace GlowBotDiscord.Data
         }
         public GuildUserData GetUserData( DiscordMember member )
         {
-            foreach (GuildUserData user in Users)
+            GuildData guildData = GetGuildData( member.Guild );
+            
+            foreach (GuildUserData user in guildData.Users)
             {
                 if ( user.Snowflake == member.Id )
                 {
@@ -32,7 +33,7 @@ namespace GlowBotDiscord.Data
                 }
             }
             GuildUserData tmp = GuildUserData.CreateFrom( member );
-            Users.Add( tmp );
+            guildData.Users.Add( tmp );
             return tmp;
         }
     }

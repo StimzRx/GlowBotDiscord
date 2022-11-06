@@ -32,5 +32,8 @@ namespace GlowBotDiscord.Data.Entities
         
         // Switches
         public bool SWITCH_AUTO_MANAGE_NOOBS { get; set; } = false;
+        
+        
+        public List<GuildUserData> Users { get; set; } = new List<GuildUserData>( );
     }
 }

@@ -20,7 +20,7 @@ namespace GlowBotDiscord.SlashCommands
         [SlashCommand( "ClearUsers", "Kicks users of the specified role." )]
         public async Task ClearUsersCommand( InteractionContext ctx, [Option( "Type", "Type of clear" )] ClearUsersType type )
         {
-            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
+            await ctx.DeferAsync( true );
 
             GuildData guildData = Program.Database.GetGuildData( ctx.Guild );
 
@@ -68,7 +68,7 @@ namespace GlowBotDiscord.SlashCommands
         [SlashCommand( "Ping", "Pings the bot" )]
         public async Task PingCommand( InteractionContext ctx )
         {
-            await ctx.CreateResponseAsync( InteractionResponseType.DeferredChannelMessageWithSource );
+            await ctx.DeferAsync( true );
 
             GuildData guildData = Program.Database.GetGuildData( ctx.Guild );
 
@@ -78,13 +78,13 @@ namespace GlowBotDiscord.SlashCommands
                 await ctx.DeleteResponseAsync( );
             }
             
-            await ctx.EditResponseAsync( new DiscordWebhookBuilder( ).WithContent( $"Pong!" ) );
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder( ).AsEphemeral( ).WithContent( $"Pong!" ) );
         }
         
         [SlashCommand( "Shutdown", "Terminates the bot" )]
         public async Task ShutdownCommand( InteractionContext ctx )
         {
-            await ctx.CreateResponseAsync( InteractionResponseType.DeferredChannelMessageWithSource );
+            await ctx.DeferAsync( true );
 
             bool callerAllowed = GlowUtils.HasMasterPermissions( ctx.Member, ctx.Guild );
 
@@ -93,7 +93,7 @@ namespace GlowBotDiscord.SlashCommands
                 await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder( ).AsEphemeral( ).WithContent( Program.ConfigData.RESPONSE_INSUFFICIENT_PERMISSIONS ) );
             }
             
-            await ctx.EditResponseAsync( new DiscordWebhookBuilder( ).WithContent( $"Shutting down D:" ) );
+            await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder( ).AsEphemeral( ).WithContent( $"Shutting Down..." ) );
             Program.Shutdown(  );
         }
     }

@@ -112,6 +112,7 @@ internal class Program
         slashCmds.RegisterCommands<SlashUtility>( ConfigData.GUILD_MASTER_ID );
         slashCmds.RegisterCommands<SlashProgram>( ConfigData.GUILD_MASTER_ID );
         slashCmds.RegisterCommands<SlashProfile>( ConfigData.GUILD_MASTER_ID );
+        slashCmds.RegisterCommands<SlashMoney>( ConfigData.GUILD_MASTER_ID );
 
         DateTime lastDbSave = DateTime.Now;
 

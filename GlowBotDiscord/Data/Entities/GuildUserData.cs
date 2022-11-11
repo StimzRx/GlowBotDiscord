@@ -35,7 +35,7 @@ namespace GlowBotDiscord.Data.Entities
         }
         public float GetExperienceToNextLevel( )
         {
-            return ( ( 4f * ( Level ^ 3 ) ) / 5f ) + 5f;
+            return ( ( 4f * ( MathF.Pow( Level, 3f ) ) ) / 5f ) + 5f;
         }
         
         public ulong Snowflake { get; set; } = 0;

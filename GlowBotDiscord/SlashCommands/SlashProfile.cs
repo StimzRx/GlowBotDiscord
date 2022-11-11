@@ -28,7 +28,7 @@ namespace GlowBotDiscord.SlashCommands
             embedBuilder.WithThumbnail( ctx.Member.AvatarUrl );
             embedBuilder.AddField( "Name", userData.Nickname, true );
             embedBuilder.AddField( "Level", userData.Level.ToString( ), true );
-            embedBuilder.AddField( "Experience", $"{userData.Experience}/{userData.GetExperienceToNextLevel().ToString( )}", false );
+            embedBuilder.AddField( "Experience", $"{userData.Experience}/{userData.GetExperienceToNextLevel()}", false );
             embedBuilder.AddField( "Tokens", userData.Currency.ToString( ), true );
             await ctx.FollowUpAsync( new DiscordFollowupMessageBuilder( ).AddEmbed( embedBuilder.Build( ) ) );
         }
@@ -52,7 +52,7 @@ namespace GlowBotDiscord.SlashCommands
             embedBuilder.AddField( "Name", userData.Nickname, true );
             embedBuilder.AddField( "Snowflake", ctx.Member.Id.ToString(), true );
             embedBuilder.AddField( "Chats", userData.Messages.ToString(), true );
-            embedBuilder.AddField( "XP", userData.Experience.ToString( ), true );
+            embedBuilder.AddField( "XP", $"{userData.Experience}/{userData.GetExperienceToNextLevel(  )}", true );
             await ctx.FollowUpAsync( new DiscordFollowupMessageBuilder( ).AsEphemeral(  ).AddEmbed( embedBuilder.Build( ) ).AsEphemeral( ) );
         }
         [SlashCommand( "DebugUser", "Admin Debug Others" )]
@@ -76,7 +76,7 @@ namespace GlowBotDiscord.SlashCommands
             embedBuilder.AddField( "Name", userData.Nickname, true );
             embedBuilder.AddField( "Snowflake", member.Id.ToString(), true );
             embedBuilder.AddField( "Chats", userData.Messages.ToString(), true );
-            embedBuilder.AddField( "XP", userData.Experience.ToString(), true );
+            embedBuilder.AddField( "XP", $"{userData.Experience}/{userData.GetExperienceToNextLevel(  )}", true );
             await ctx.FollowUpAsync( new DiscordFollowupMessageBuilder( ).AddEmbed( embedBuilder.Build( ) ).AsEphemeral( ) );
         }
     }

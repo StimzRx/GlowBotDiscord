@@ -308,9 +308,9 @@ internal class Program
             Time = DateTime.UtcNow,
             HandledMentionSpam = false,
         });
-        if ( userData.MessageHistory.Count > 4 )
+        if ( userData.MessageHistory.Count > 10 )
         {
-            userData.MessageHistory.RemoveRange( 0, userData.MessageHistory.Count - 4 );
+            userData.MessageHistory.RemoveRange( 0, userData.MessageHistory.Count - 10 );
         }
 
         if ( !GlowUtils.HasAdminPermissions( member, member.Guild ) )
@@ -325,7 +325,7 @@ internal class Program
                     foundMentions += history.MentionCount;
                 }
             }
-            if ( foundMentions >= 10 )
+            if ( foundMentions >= 7 )
             {
                 foreach (MsgHistory msg in foundMessages)
                 {

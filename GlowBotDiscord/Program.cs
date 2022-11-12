@@ -306,7 +306,7 @@ internal class Program
             Message = e.Message.ToString(  ),
             ContainsMention = ( e.MentionedChannels.Count > 0 || e.MentionedRoles.Count > 0 || e.MentionedUsers.Count > 0 ),
         });
-        if ( userData.MessageHistory.Count > 6 )
+        if ( userData.MessageHistory.Count > 4 )
         {
             userData.MessageHistory.RemoveRange( 0, userData.MessageHistory.Count - 6 );
         }
@@ -319,7 +319,7 @@ internal class Program
                 if ( history.ContainsMention )
                     foundMentions++;
             }
-            if ( foundMentions >= 4 )
+            if ( foundMentions >= 10 )
             {
                 userData.MessageHistory.Clear(  );
                 await member.TimeoutAsync( new DateTimeOffset( DateTime.Now + TimeSpan.FromMinutes( 15 ) ) );

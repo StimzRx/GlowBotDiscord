@@ -310,7 +310,7 @@ internal class Program
         });
         if ( userData.MessageHistory.Count > 4 )
         {
-            userData.MessageHistory.RemoveRange( 0, userData.MessageHistory.Count - 10 );
+            userData.MessageHistory.RemoveRange( 0, userData.MessageHistory.Count - 4 );
         }
 
         if ( !GlowUtils.HasAdminPermissions( member, member.Guild ) )

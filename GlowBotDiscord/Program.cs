@@ -304,26 +304,38 @@ internal class Program
         userData.MessageHistory.Add( new MsgHistory(  )
         {
             Message = e.Message.ToString(  ),
-            ContainsMention = ( e.MentionedChannels.Count > 0 || e.MentionedRoles.Count > 0 || e.MentionedUsers.Count > 0 ),
+            MentionCount = ( e.MentionedRoles.Count + e.MentionedUsers.Count ),
+            Time = DateTime.UtcNow,
+            HandledMentionSpam = false,
         });
-        if ( userData.MessageHistory.Count > 6 )
+        if ( userData.MessageHistory.Count > 10 )
         {
-            userData.MessageHistory.RemoveRange( 0, userData.MessageHistory.Count - 6 );
+            userData.MessageHistory.RemoveRange( 0, userData.MessageHistory.Count - 10 );
         }
 
         if ( !GlowUtils.HasAdminPermissions( member, member.Guild ) )
         {
+            List<MsgHistory> foundMessages = new List<MsgHistory>( );
             int foundMentions = 0;
             foreach (MsgHistory history in userData.MessageHistory)
             {
-                if ( history.ContainsMention )
-                    foundMentions++;
+                if ( history.MentionCount > 0 && ( DateTime.UtcNow - history.Time ).TotalMinutes <= 8 && !history.HandledMentionSpam )
+                {
+                    foundMessages.Add( history );
+                    foundMentions += history.MentionCount;
+                }
             }
             if ( foundMentions >= 4 )
             {
-                userData.MessageHistory.Clear(  );
+                foreach (MsgHistory msg in foundMessages)
+                {
+                    msg.HandledMentionSpam = true;
+                }
+                
                 await member.TimeoutAsync( new DateTimeOffset( DateTime.Now + TimeSpan.FromMinutes( 15 ) ) );
-            
+
+                await e.Message.DeleteAsync( );
+                
                 DiscordEmbedBuilder embedBuilder = new DiscordEmbedBuilder( );
                 embedBuilder.WithTitle( $"User Timed Out - Mention Spam" );
                 embedBuilder.WithColor( DiscordColor.Red );

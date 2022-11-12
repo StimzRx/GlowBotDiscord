@@ -51,5 +51,7 @@ namespace GlowBotDiscord.Data.Entities
         public DateTime LastTalkedTime { get; set; }
         public DateTime LastCommandTime { get; set; }
         public DateTime LastNewVCTime { get; set; }
+
+        public List<MsgHistory> MessageHistory { get; set; } = new List<MsgHistory>( );
     }
 }

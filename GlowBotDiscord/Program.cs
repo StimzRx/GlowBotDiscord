@@ -5,6 +5,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands;
 
+using GlowBotDiscord.API;
 using GlowBotDiscord.Data;
 using GlowBotDiscord.Data.Entities;
 using GlowBotDiscord.SlashCommands;
@@ -291,13 +292,51 @@ internal class Program
         
         
         GuildData guildData = Database.GetGuildData( e.Guild );
-        if ( e.Channel.Id != guildData.ServerTC_General || e.Author.IsBot )
+        if ( e.Author.IsBot )
         {
             return;
         }
+        
         DiscordMember member = (DiscordMember)e.Author;
-
+        
         GuildUserData userData = Database.GetUserData( member );
+        
+        userData.MessageHistory.Add( new MsgHistory(  )
+        {
+            Message = e.Message.ToString(  ),
+            ContainsMention = ( e.MentionedChannels.Count > 0 || e.MentionedRoles.Count > 0 || e.MentionedUsers.Count > 0 ),
+        });
+        if ( userData.MessageHistory.Count > 6 )
+        {
+            userData.MessageHistory.RemoveRange( 0, userData.MessageHistory.Count - 6 );
+        }
+
+        if ( !GlowUtils.HasAdminPermissions( member, member.Guild ) )
+        {
+            int foundMentions = 0;
+            foreach (MsgHistory history in userData.MessageHistory)
+            {
+                if ( history.ContainsMention )
+                    foundMentions++;
+            }
+            if ( foundMentions >= 4 )
+            {
+                userData.MessageHistory.Clear(  );
+                await member.TimeoutAsync( new DateTimeOffset( DateTime.Now + TimeSpan.FromMinutes( 15 ) ) );
+            
+                DiscordEmbedBuilder embedBuilder = new DiscordEmbedBuilder( );
+                embedBuilder.WithTitle( $"User Timed Out - Mention Spam" );
+                embedBuilder.WithColor( DiscordColor.Red );
+                embedBuilder.WithThumbnail( member.AvatarUrl );
+                embedBuilder.AddField( "Mentions", foundMentions.ToString(), true );
+                embedBuilder.AddField( "Time", $"15 minutes", true );
+            
+                await member.Guild.GetChannel( guildData.ServerTC_Logs ).SendMessageAsync( new DiscordMessageBuilder(  ).AddEmbed( embedBuilder.Build(  ) ) );
+            }
+        }
+
+        if ( e.Channel.Id != guildData.ServerTC_General )
+            return;
         userData.Messages += 1;
         
         if ( ( DateTime.Now - userData.LastTalkedTime ).TotalMinutes >= 30 )

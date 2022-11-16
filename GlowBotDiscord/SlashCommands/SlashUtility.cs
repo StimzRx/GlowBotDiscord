@@ -1,5 +1,6 @@
 ﻿using DSharpPlus;
 using DSharpPlus.Entities;
+using DSharpPlus.Exceptions;
 using DSharpPlus.SlashCommands;
 
 using GlowBotDiscord.API;
@@ -9,6 +10,44 @@ namespace GlowBotDiscord.SlashCommands
 {
     public class SlashUtility : ApplicationCommandModule
     {
+        public async Task BanUserCommand(InteractionContext ctx, [Option("User", "User to ban")] DiscordUser discordUser, [Option("Reason", "Reason for ban")] string reason)
+        {
+            await ctx.DeferAsync(  );
+
+            GuildData guildData = Program.Database.GetGuildData( ctx.Guild );
+
+            bool permitted = GlowUtils.HasAdminPermissions( ctx.Member, ctx.Guild );
+
+            if ( !permitted )
+            {
+                await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder( ).WithContent( Program.ConfigData.RESPONSE_INSUFFICIENT_PERMISSIONS ) );
+                return;
+            }
+            DiscordMember targetMember = (DiscordMember)discordUser;
+            
+            GuildUserData targetUserData = Program.Database.GetUserData( targetMember );
+            GuildUserData sourceUserData = Program.Database.GetUserData( ctx.Member );
+            
+            DiscordEmbedBuilder embedBuilder = new DiscordEmbedBuilder( );
+            embedBuilder.WithTitle( $"Banned User" );
+            embedBuilder.WithColor( DiscordColor.Red );
+            embedBuilder.WithThumbnail( ctx.Member.AvatarUrl );
+            embedBuilder.AddField( "Name", targetUserData.Nickname );
+            embedBuilder.AddField( "Reason", reason );
+            embedBuilder.WithFooter( $"Banned by '{sourceUserData.Nickname}'({ctx.Member.Id})" );
+
+            try
+            {
+                await targetMember.CreateDmChannelAsync( ).Result.SendMessageAsync( embedBuilder.Build( ) );
+            }
+            catch ( UnauthorizedException ex ) { }
+            
+            await targetMember.BanAsync( 0, $"[GlowBan]:"+reason );
+
+            await ctx.Guild.GetChannel( guildData.ServerTC_General ).SendMessageAsync( embedBuilder.Build( ) );
+        }
+        
+        
         public enum ClearUsersType
         {
             [ChoiceName("Pending")]

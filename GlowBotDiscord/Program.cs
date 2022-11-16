@@ -325,23 +325,31 @@ internal class Program
                     foundMentions += history.MentionCount;
                 }
             }
-            if ( foundMentions >= 7 )
+            if ( foundMentions > 5 )
             {
                 foreach (MsgHistory msg in foundMessages)
                 {
                     msg.HandledMentionSpam = true;
                 }
                 
-                await member.TimeoutAsync( new DateTimeOffset( DateTime.Now + TimeSpan.FromMinutes( 15 ) ) );
+                await member.TimeoutAsync( new DateTimeOffset( DateTime.Now + TimeSpan.FromMinutes( 30 ) ) );
 
                 await e.Message.DeleteAsync( );
+                
+                // When creating DM channel, a exception will throw if the user has the bot blocked. Catch it silently.
+                try
+                {
+                    await member.CreateDmChannelAsync(  ).Result.SendMessageAsync( $"You have been penalized for spamming mentions. Please wait 30 minutes and try again!" );
+                }
+                catch ( UnauthorizedAccessException ex ) { }
                 
                 DiscordEmbedBuilder embedBuilder = new DiscordEmbedBuilder( );
                 embedBuilder.WithTitle( $"User Timed Out - Mention Spam" );
                 embedBuilder.WithColor( DiscordColor.Red );
                 embedBuilder.WithThumbnail( member.AvatarUrl );
+                embedBuilder.AddField( "Name", userData.Nickname, false );
                 embedBuilder.AddField( "Mentions", foundMentions.ToString(), true );
-                embedBuilder.AddField( "Time", $"15 minutes", true );
+                embedBuilder.AddField( "Time", $"30 minutes", true );
             
                 await member.Guild.GetChannel( guildData.ServerTC_Logs ).SendMessageAsync( new DiscordMessageBuilder(  ).AddEmbed( embedBuilder.Build(  ) ) );
             }

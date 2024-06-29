@@ -23,30 +23,7 @@ internal class Program
     const string LogFileName = "log.txt";
 
 
-    static void Main( string[ ] args )
-    {
-        try
-        {
-            MainAsync( ).GetAwaiter( ).GetResult( );
-        }
-        catch ( Exception ex )
-        {
-            Log( $"Crash: {ex}", ConsoleColor.Red );
-            throw;
-        }
-    }
-
-    public static void Log( string msg, ConsoleColor color )
-    {
-        ConsoleColor oldColor = Console.ForegroundColor;
-        Console.ForegroundColor = color;
-        Console.WriteLine( msg );
-        Console.ForegroundColor = oldColor;
-
-        File.AppendAllText( BinPath + LogFileName, $"[{DateTime.Now.ToShortTimeString( )}] {msg}{Environment.NewLine}" );
-    }
-
-    async private static Task MainAsync( )
+    private static async Task Main( string[ ] args )
     {
         string json = string.Empty;
         BinPath = $"{Path.GetDirectoryName( Assembly.GetEntryAssembly( )?.Location )}/configs/";
@@ -139,7 +116,17 @@ internal class Program
         Log( $"Shutdown Complete!", ConsoleColor.Red );
     }
 
-    async private static Task SaveDatabase( )
+    public static void Log( string msg, ConsoleColor color )
+    {
+        ConsoleColor oldColor = Console.ForegroundColor;
+        Console.ForegroundColor = color;
+        Console.WriteLine( msg );
+        Console.ForegroundColor = oldColor;
+
+        File.AppendAllText( BinPath + LogFileName, $"[{DateTime.Now.ToShortTimeString( )}] {msg}{Environment.NewLine}" );
+    }
+
+    private static async Task SaveDatabase( )
     {
         if ( File.Exists( BinPath + DbFileName ) )
         {
